@@ -1,22 +1,31 @@
 import dotenv from 'dotenv';
-import mssql from 'mssql';
 
 class sqlConnection {
-  public mssql: any;
+
+  public mssql = require('mssql');
+
   constructor() {
     dotenv.config();
-    // this.dbConnection();
-    mssql.connect({
-      server: process.env.DB_URL || "",
-      user: process.env.DB_USER || "",
-      password: process.env.DB_PASSWORD || "",
-      port: parseInt(process.env.DB_PORT || ""),
-      options: {
-        encrypt: true, // for azure
-        trustServerCertificate: true // change to true for local dev / self-signed certs
-      }
-    });
+    this.connectionSetup();
   }
 
+  private connectionSetup() {
+    var config = {
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      server: process.env.DB_URL,
+      database: process.env.DB_NAME,
+      port: parseInt(process.env.DB_PORT || ""),
+      options: {
+        trustServerCertificate: true // change to true for local dev / self-signed certs
+      }
+    };
+
+    // connect to your database
+    this.mssql.connect(config, function (err: any) {
+      if (err)
+        console.log(err);
+    });
+  }
 }
 export default new sqlConnection().mssql;

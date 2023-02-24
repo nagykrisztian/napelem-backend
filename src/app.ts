@@ -15,7 +15,6 @@ class App {
     this.expressConfig();
     this.routePrv.routes(this.app);
     dotenv.config();
-    this.dbConnection();
   }
 
   private expressConfig(): void {
@@ -36,15 +35,5 @@ class App {
     this.app.use(bodyParser.urlencoded({ extended: false }));
   }
 
-  private dbConnection(): void {
-
-    this.sqlConnection = mysql.createConnection({
-      host: process.env.DB_URL,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      port: parseInt(process.env.DB_PORT || "")
-    });
-  }
 }
 export default new App().app;
