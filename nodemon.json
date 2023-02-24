@@ -1,0 +1,12 @@
+{
+  "signal": "SIGHUP",
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "watch": [
+    "src/"
+  ],
+  "ext": "ts, js, txt, json, ico",
+  "delay": 0,
+  "exec": "tsc && node --inspect ./dist/server.js || exit 1"
+}

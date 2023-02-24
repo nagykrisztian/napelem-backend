@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "strict": true,
+    "pretty": true,
+    "allowJs": true,
+    "sourceMap": true,
+    "removeComments": true,
+    "experimentalDecorators": true,
+    "target": "esnext",
+    "emitDecoratorMetadata": true,
+    "moduleResolution": "node",
+    "importHelpers": false,
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "types": [
+      "node"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ]
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules/**/*",
+    "**/node_modules/*"
+  ]
+}
