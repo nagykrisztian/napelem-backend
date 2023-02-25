@@ -1,13 +1,11 @@
 import express from 'express';
-import Routes from './routes/routes';
-import mysql from 'mysql';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
-
+import Routes from './routes/routes';
 
 class App {
-  public sqlConnection: any;
   public app: express.Application;
+
   public routePrv: Routes = new Routes();
 
   constructor() {
@@ -34,6 +32,5 @@ class App {
     // });
     this.app.use(bodyParser.urlencoded({ extended: false }));
   }
-
 }
 export default new App().app;
