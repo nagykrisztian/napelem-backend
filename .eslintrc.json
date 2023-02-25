@@ -27,7 +27,6 @@
         "import/extensions": "off",
         "no-console": "off",
         "class-methods-use-this": "off",
-        "@typescript-eslint/no-explicit-any": "off",
-        "func-names": "off"
+        "@typescript-eslint/no-explicit-any": "warn"
     }
 }

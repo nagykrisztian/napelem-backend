@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "CommonJS",
     "esModuleInterop": true,
     "strict": true,
     "pretty": true,
@@ -11,7 +11,7 @@
     "target": "esnext",
     "emitDecoratorMetadata": true,
     "moduleResolution": "node",
-    "importHelpers": false,
+    "importHelpers": true,
     "outDir": "./dist",
     "baseUrl": "./src",
     "types": [
