@@ -1,0 +1,12 @@
+{
+  "semi": true,
+  "printWidth": 150,
+  "tabWidth": 2,
+  "eslintIntegration": true,
+  "stylelintIntegration": false,
+  "endOfLine": "auto",
+  "arrowParens": "always",
+  "trailingComma": "es5",
+  "useTabs": false,
+  "singleQuote": true
+}
