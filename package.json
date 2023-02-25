@@ -22,7 +22,15 @@
     "@types/mssql": "^8.1.2",
     "@types/mysql": "^2.15.21",
     "@types/node": "^18.14.1",
+    "@typescript-eslint/eslint-plugin": "^5.53.0",
+    "@typescript-eslint/parser": "^5.53.0",
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-prettier": "^4.2.1",
     "nodemon": "^2.0.20",
+    "prettier": "2.8.4",
     "typescript": "^4.9.5"
   }
 }
