@@ -1,3 +1,9 @@
 {
-  "dotenv.enableAutocloaking": false
+  "dotenv.enableAutocloaking": false,
+  "eslint.alwaysShowStatus": true,
+  "eslint.validate": ["javascript", "typescript"],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
 }
