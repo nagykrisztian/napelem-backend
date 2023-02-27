@@ -16,8 +16,10 @@ export default class Controller {
 
   public authenticate = (req: Request, res: Response) => {
     mssql
-      // .query(`SELECT * FROM Felhasznalo WHERE felhasznalonev = ${req.body.username};`)
-      .query('select 1+1 as result')
+      .query(
+        `select u.username,u.[password],p.permissionName from Users u join Permissions p on u.perrmissionID=p.permissionID WHERE u.username = '${req.body.username}';`
+      )
+      // .query('select 1+1 as result')
       .then((result) => {
         if (result.rowsAffected[0] === 0) {
           res.status(401).send({
@@ -32,10 +34,9 @@ export default class Controller {
           });
           return;
         }
-
         const payload = {
-          name: req.body.username,
-          role: result.recordset[0].role,
+          username: req.body.username,
+          permission: result.recordset[0].permissionName,
         };
 
         const token = jwt.sign(payload, process.env.JWT_SECRET || 'asd', {
@@ -43,7 +44,7 @@ export default class Controller {
           expiresIn: '30m',
         });
 
-        res.status(201).json({ token, status: 201, hash: createHash('sha256').update('porcica1').digest('hex') });
+        res.status(200).json({ token, status: 200 });
       })
       .catch((err) => {
         console.log(err);
