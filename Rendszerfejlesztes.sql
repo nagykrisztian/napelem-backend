@@ -131,4 +131,7 @@ INSERT INTO Storage
     (2,3,1,6,200),
     (3,1,1,7,300)
 
-
+INSERT INTO Telemetry(projectID, stateID, startDate)
+    VALUES
+    (1,1,'2023-01-15'),
+    (2,1,'2023-02-27')
