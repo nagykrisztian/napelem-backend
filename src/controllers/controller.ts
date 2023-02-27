@@ -15,7 +15,6 @@ export default class Controller {
   };
 
   public authenticate = (req: Request, res: Response) => {
-    console.log();
     mssql
       // .query(`SELECT * FROM Felhasznalo WHERE felhasznalonev = ${req.body.username};`)
       .query('select 1+1 as result')
