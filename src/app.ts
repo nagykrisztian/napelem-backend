@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
-import Routes from './routes/routes';
+import Routes from './routes/routes.js';
 
 class App {
   public app: express.Application;
