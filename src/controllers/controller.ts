@@ -53,4 +53,13 @@ export default class Controller {
         });
       });
   };
+
+  public getAllParts = (req: Request, res: Response) => {
+    mssql
+      .query(`SELECT * from Parts`)
+      .then((result) => {
+        res.status(200).send({ result: result.recordset, status: 200 });
+      })
+      .catch((err) => console.log(err));
+  };
 }
