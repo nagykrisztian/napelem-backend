@@ -44,7 +44,7 @@ export default class Controller {
           expiresIn: '30m',
         });
 
-        res.status(200).json({ token, status: 200 });
+        res.status(200).json({ token, permission: result.recordset[0].permissionName, status: 200 });
       })
       .catch((err) => {
         console.log(err);
