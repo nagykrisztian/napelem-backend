@@ -53,4 +53,48 @@ export default class Controller {
         });
       });
   };
+
+  public getAllParts = (req: Request, res: Response) => {
+    mssql
+      .query(`SELECT * from Parts`)
+      .then((result) => {
+        res.status(200).send({ result: result.recordset, status: 200 });
+      })
+      .catch((err) => console.log(err));
+  };
+
+  public addPart = (req: Request, res: Response) => {
+    mssql
+      .query(
+        `INSERT INTO Parts([partName], price, partPerBox)
+        VALUES
+        ('${req.body.partName}',${req.body.price}, ${req.body.partPerBox})`
+      )
+      .then(() => {
+        res.sendStatus(201);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(400).send({
+          msg: err,
+        });
+      });
+  };
+
+  public modifyPartPrice = (req: Request, res: Response) => {
+    mssql
+      .query(
+        `UPDATE Parts
+      SET price = ${req.body.price} WHERE partID = ${req.params.partID};`
+      )
+      .then(() => {
+        res.sendStatus(200);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(400).send({
+          msg: err,
+        });
+      });
+  };
 }
