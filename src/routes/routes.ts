@@ -24,6 +24,11 @@ class Routes {
       console.log(`Request type ${req.method} from ${req.originalUrl} time: ${new Date().toLocaleString()}`);
       next();
     }, this.controller.addPart);
+
+    app.route('/modifyPartPrice/:partID').patch((req: Request, res: Response, next: NextFunction) => {
+      console.log(`Request type ${req.method} from ${req.originalUrl} time: ${new Date().toLocaleString()}`);
+      next();
+    }, this.controller.modifyPartPrice);
   }
 }
 

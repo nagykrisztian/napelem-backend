@@ -80,4 +80,21 @@ export default class Controller {
         });
       });
   };
+
+  public modifyPartPrice = (req: Request, res: Response) => {
+    mssql
+      .query(
+        `UPDATE Parts
+      SET price = ${req.body.price} WHERE partID = ${req.params.partID};`
+      )
+      .then(() => {
+        res.sendStatus(200);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(400).send({
+          msg: err,
+        });
+      });
+  };
 }
