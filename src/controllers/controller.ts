@@ -62,4 +62,22 @@ export default class Controller {
       })
       .catch((err) => console.log(err));
   };
+
+  public addPart = (req: Request, res: Response) => {
+    mssql
+      .query(
+        `INSERT INTO Parts([partName], price, partPerBox)
+        VALUES
+        ('${req.body.partName}',${req.body.price}, ${req.body.partPerBox})`
+      )
+      .then(() => {
+        res.sendStatus(201);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(400).send({
+          msg: err,
+        });
+      });
+  };
 }

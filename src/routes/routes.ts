@@ -19,6 +19,11 @@ class Routes {
       console.log(`Request type ${req.method} from ${req.originalUrl} time: ${new Date().toLocaleString()}`);
       next();
     }, this.controller.getAllParts);
+
+    app.route('/addPart').post((req: Request, res: Response, next: NextFunction) => {
+      console.log(`Request type ${req.method} from ${req.originalUrl} time: ${new Date().toLocaleString()}`);
+      next();
+    }, this.controller.addPart);
   }
 }
 
