@@ -16,7 +16,7 @@ DROP TABLE IF EXISTS Users
 CREATE TABLE Users(
     username VARCHAR(50) NOT NULL PRIMARY KEY,
     [password] VARCHAR(100) NOT NULL,
-    perrmissionID INT NOT NULL FOREIGN KEY REFERENCES [Permissions](permissionID)
+    perrmissionID INT NOT NULL FOREIGN KEY REFERENCES [Permissions](permissionID) ON UPDATE cascade
 )
 
 DROP TABLE IF EXISTS [States]
@@ -37,14 +37,14 @@ CREATE TABLE Customers(
 DROP TABLE IF EXISTS Projects
 CREATE TABLE Projects(
     projectID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-    username VARCHAR(50) NOT NULL FOREIGN KEY REFERENCES Users(username),
+    username VARCHAR(50) NOT NULL FOREIGN KEY REFERENCES Users(username) ON UPDATE cascade,
     orderDate DATE,
     workingTime INT,
     laborFee INT,
     [address] VARCHAR(50),
     [description] VARCHAR(50),
-    customerSSN VARCHAR(50) NOT NULL FOREIGN KEY REFERENCES Customers(SSN),
-    currentStateID INT NOT NULL FOREIGN KEY REFERENCES [States](stateID)
+    customerSSN VARCHAR(50) FOREIGN KEY REFERENCES Customers(SSN) ON UPDATE cascade ON DELETE SET NULL,
+    currentStateID INT FOREIGN KEY REFERENCES [States](stateID)ON UPDATE cascade ON DELETE SET NULL
 )
 
 DROP TABLE IF EXISTS Storage
@@ -53,14 +53,14 @@ CREATE TABLE Storage(
     [row] INT NOT NULL,
     [column] INT NOT NULL,
     [level] INT NOT NULL,
-    partID INT NOT NULL FOREIGN KEY REFERENCES Parts(partID),
+    partID INT FOREIGN KEY REFERENCES Parts(partID) ON UPDATE cascade ON DELETE SET NULL,
     currentPieces INT
 )
 
 DROP TABLE IF EXISTS Parts_needed
 CREATE TABLE Parts_needed(
-    partID INT NOT NULL FOREIGN KEY REFERENCES Parts(partID),
-    projectID INT NOT NULL FOREIGN KEY REFERENCES Projects(projectID),
+    partID INT NOT NULL FOREIGN KEY REFERENCES Parts(partID) ON UPDATE cascade,
+    projectID INT NOT NULL FOREIGN KEY REFERENCES Projects(projectID) ON UPDATE cascade,
     reguiredQuantity INT,
     PRIMARY KEY(partID, projectID)
 )
@@ -73,7 +73,7 @@ CREATE TABLE Telemetry(
     finishDate DATE,
     PRIMARY KEY(projectID, stateID)
 )
---GO
+-- GO
 -- DROP TABLE IF EXISTS Telemetry
 -- DROP TABLE IF EXISTS Parts_needed
 -- DROP TABLE IF EXISTS Storage
@@ -98,13 +98,13 @@ INSERT INTO Parts([partName], price, partPerBox)
     ('Kábel 3mm', 800, 300)
 
 INSERT INTO [Permissions](permissionName)
-    VALUES('Szakember'),('Raktáros'),('Raktárvezető')
+    VALUES('Szakember'),('Raktaros'),('Raktarvezeto')
 
 INSERT INTO Users
     VALUES
     ('szakember1','58ac22875aee49f8f6ec08c5c7bdc20094fa0bf7384bf841d4ef6d8a6013a59c',1),-- szakember1, szakemberjelszo
     ('raktaros1','4c28b8b24fed825f74f0df5749274682c7d88f3c08d816d52efe9c9a25e440d3',2),-- raktaros1, raktarosjelszo
-    ('raktarvezeto1','4bd05fb1bef4fafabce6dcd47491614d5bc9a089bf1c28cf7369ac5d3a313bee',3)-- raktaros1, raktarvezetojelszo
+    ('raktarvezeto1','4bd05fb1bef4fafabce6dcd47491614d5bc9a089bf1c28cf7369ac5d3a313bee',3)-- raktarosvezeto1, raktarvezetojelszo
 
 INSERT INTO States
     VALUES
