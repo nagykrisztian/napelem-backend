@@ -5,8 +5,7 @@ import mssql from '../sql.js';
 
 export default class Controller {
   public testMethod = (req: Request, res: Response) => {
-    mssql
-      .query('select 1+1 as result')
+    mssql.query`SELECT 1+1 AS result');`
       .then((result) => {
         // console.log(result.recordset);
         res.send(result.recordset);
@@ -15,11 +14,7 @@ export default class Controller {
   };
 
   public authenticate = (req: Request, res: Response) => {
-    mssql
-      .query(
-        `select u.username,u.[password],p.permissionName from Users u join Permissions p on u.perrmissionID=p.permissionID WHERE u.username = '${req.body.username}';`
-      )
-      // .query('select 1+1 as result')
+    mssql.query`SELECT u.username,u.[password],p.permissionName FROM Users u join Permissions p ON u.perrmissionID=p.permissionID WHERE u.username = '${req.body.username}';`
       .then((result) => {
         if (result.rowsAffected[0] === 0) {
           res.status(401).send({
@@ -55,8 +50,7 @@ export default class Controller {
   };
 
   public getAllParts = (req: Request, res: Response) => {
-    mssql
-      .query(`SELECT * from Parts`)
+    mssql.query`SELECT * FROM Parts;`
       .then((result) => {
         res.status(200).send({ result: result.recordset, status: 200 });
       })
@@ -64,12 +58,7 @@ export default class Controller {
   };
 
   public addPart = (req: Request, res: Response) => {
-    mssql
-      .query(
-        `INSERT INTO Parts([partName], price, partPerBox)
-        VALUES
-        ('${req.body.partName}',${req.body.price}, ${req.body.partPerBox})`
-      )
+    mssql.query`INSERT INTO Parts([partName], price, partPerBox) VALUES('${req.body.partName}',${req.body.price}, ${req.body.partPerBox});`
       .then(() => {
         res.sendStatus(201);
       })
@@ -82,11 +71,7 @@ export default class Controller {
   };
 
   public modifyPartPrice = (req: Request, res: Response) => {
-    mssql
-      .query(
-        `UPDATE Parts
-      SET price = ${req.body.price} WHERE partID = ${req.params.partID};`
-      )
+    mssql.query`UPDATE Parts SET price = ${req.body.price} WHERE partID = ${req.params.partID};`
       .then(() => {
         res.sendStatus(200);
       })
