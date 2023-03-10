@@ -14,7 +14,7 @@ export default class Controller {
   };
 
   public authenticate = (req: Request, res: Response) => {
-    mssql.query`SELECT u.username,u.[password],p.permissionName FROM Users u join Permissions p ON u.perrmissionID=p.permissionID WHERE u.username = '${req.body.username}';`
+    mssql.query`SELECT u.username,u.[password],p.permissionName FROM Users u join Permissions p ON u.perrmissionID=p.permissionID WHERE u.username = ${req.body.username};`
       .then((result) => {
         if (result.rowsAffected[0] === 0) {
           res.status(401).send({
@@ -58,7 +58,7 @@ export default class Controller {
   };
 
   public addPart = (req: Request, res: Response) => {
-    mssql.query`INSERT INTO Parts([partName], price, partPerBox) VALUES('${req.body.partName}',${req.body.price}, ${req.body.partPerBox});`
+    mssql.query`INSERT INTO Parts([partName], price, partPerBox) VALUES(${req.body.partName},${req.body.price}, ${req.body.partPerBox});`
       .then(() => {
         res.sendStatus(201);
       })
