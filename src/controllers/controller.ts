@@ -16,19 +16,11 @@ export default class Controller {
   public authenticate = (req: Request, res: Response) => {
     mssql.query`SELECT u.username,u.[password],p.permissionName FROM Users u join Permissions p ON u.perrmissionID=p.permissionID WHERE u.username = ${req.body.username};`
       .then((result) => {
-        if (result.rowsAffected[0] === 0) {
-          res.status(401).send({
-            msg: 'Email or password is incorrect!',
-          });
-          return;
-        }
+        if (result.rowsAffected[0] === 0) return res.status(401).send({ msg: 'Email or password is incorrect!' });
 
-        if (result.recordset[0].password !== createHash('sha256').update(req.body.password).digest('hex')) {
-          res.status(401).send({
-            msg: 'Email or password is incorrect!',
-          });
-          return;
-        }
+        if (result.recordset[0].password !== createHash('sha256').update(req.body.password).digest('hex'))
+          return res.status(401).send({ msg: 'Email or password is incorrect!' });
+
         const payload = {
           username: req.body.username,
           permission: result.recordset[0].permissionName,
