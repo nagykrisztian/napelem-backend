@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { createHash } from 'node:crypto';
 import mssql from '../sql.js';
 
@@ -34,10 +34,10 @@ export default class Controller {
           permission: result.recordset[0].permissionName,
         };
 
-        const token = jwt.sign(payload, process.env.JWT_SECRET || 'asd', {
+        const token = `Bearer ${jwt.sign(payload, process.env.JWT_SECRET || 'asd', {
           algorithm: 'HS256',
           expiresIn: '30m',
-        });
+        })}`;
 
         res.status(200).json({ token, permission: result.recordset[0].permissionName, status: 200 });
       })
@@ -50,6 +50,10 @@ export default class Controller {
   };
 
   public getAllParts = (req: Request, res: Response) => {
+    if (!req.headers.authorization) return res.sendStatus(403);
+    const payload: JwtPayload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    if (payload.permission !== 'Raktarvezeto') return res.sendStatus(403);
+
     mssql.query`SELECT * FROM Parts;`
       .then((result) => {
         res.status(200).send({ result: result.recordset, status: 200 });
@@ -58,6 +62,10 @@ export default class Controller {
   };
 
   public addPart = (req: Request, res: Response) => {
+    if (!req.headers.authorization) return res.sendStatus(403);
+    const payload: JwtPayload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    if (payload.permission !== 'Raktarvezeto') return res.sendStatus(403);
+
     mssql.query`INSERT INTO Parts([partName], price, partPerBox) VALUES(${req.body.partName},${req.body.price}, ${req.body.partPerBox});`
       .then(() => {
         res.sendStatus(201);
@@ -71,6 +79,10 @@ export default class Controller {
   };
 
   public modifyPartPrice = (req: Request, res: Response) => {
+    if (!req.headers.authorization) return res.sendStatus(403);
+    const payload: JwtPayload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    if (payload.permission !== 'Raktarvezeto') return res.sendStatus(403);
+
     mssql.query`UPDATE Parts SET price = ${req.body.price} WHERE partID = ${req.params.partID};`
       .then(() => {
         res.sendStatus(200);
