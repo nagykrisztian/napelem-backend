@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload, TokenExpiredError } from 'jsonwebtoken';
 import { createHash } from 'node:crypto';
 import mssql from '../sql.js';
 
@@ -31,59 +31,68 @@ export default class Controller {
           expiresIn: '30m',
         })}`;
 
-        res.status(200).json({ token, permission: result.recordset[0].permissionName, status: 200 });
+        res.status(200).send({ token, permission: result.recordset[0].permissionName });
       })
-      .catch((err) => {
-        console.log(err);
-        res.status(400).send({
-          msg: err,
-        });
-      });
+      .catch((err) => res.status(400).send({ msg: err }));
   };
 
   public getAllParts = (req: Request, res: Response) => {
     if (!req.headers.authorization) return res.sendStatus(403);
-    const payload: JwtPayload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    let payload: JwtPayload;
+    try {
+      payload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    } catch (err) {
+      if (err instanceof jwt.TokenExpiredError)
+        return res.status(401).send({ msg: `Token expired at ${(err as TokenExpiredError).expiredAt.toLocaleString()}` });
+      return res.status(401).send(err);
+    }
+
     if (payload.permission !== 'Raktarvezeto') return res.sendStatus(403);
 
     mssql.query`SELECT * FROM Parts;`
       .then((result) => {
-        res.status(200).send({ result: result.recordset, status: 200 });
+        res.status(200).send({ result: result.recordset });
       })
-      .catch((err) => console.log(err));
+      .catch((err) => res.status(400).send({ msg: err }));
   };
 
   public addPart = (req: Request, res: Response) => {
     if (!req.headers.authorization) return res.sendStatus(403);
-    const payload: JwtPayload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    let payload: JwtPayload;
+    try {
+      payload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    } catch (err) {
+      if (err instanceof jwt.TokenExpiredError)
+        return res.status(401).send({ msg: `Token expired at ${(err as TokenExpiredError).expiredAt.toLocaleString()}` });
+      return res.status(401).send(err);
+    }
+
     if (payload.permission !== 'Raktarvezeto') return res.sendStatus(403);
 
     mssql.query`INSERT INTO Parts([partName], price, partPerBox) VALUES(${req.body.partName},${req.body.price}, ${req.body.partPerBox});`
       .then(() => {
         res.sendStatus(201);
       })
-      .catch((err) => {
-        console.log(err);
-        res.status(400).send({
-          msg: err,
-        });
-      });
+      .catch((err) => res.status(400).send({ msg: err }));
   };
 
   public modifyPartPrice = (req: Request, res: Response) => {
     if (!req.headers.authorization) return res.sendStatus(403);
-    const payload: JwtPayload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    let payload: JwtPayload;
+    try {
+      payload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    } catch (err) {
+      if (err instanceof jwt.TokenExpiredError)
+        return res.status(401).send({ msg: `Token expired at ${(err as TokenExpiredError).expiredAt.toLocaleString()}` });
+      return res.status(401).send(err);
+    }
+
     if (payload.permission !== 'Raktarvezeto') return res.sendStatus(403);
 
     mssql.query`UPDATE Parts SET price = ${req.body.price} WHERE partID = ${req.params.partID};`
       .then(() => {
         res.sendStatus(200);
       })
-      .catch((err) => {
-        console.log(err);
-        res.status(400).send({
-          msg: err,
-        });
-      });
+      .catch((err) => res.status(400).send({ msg: err }));
   };
 }
