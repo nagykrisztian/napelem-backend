@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload, TokenExpiredError } from 'jsonwebtoken';
 import { createHash } from 'node:crypto';
 import mssql from '../sql.js';
 
@@ -43,7 +43,12 @@ export default class Controller {
 
   public getAllParts = (req: Request, res: Response) => {
     if (!req.headers.authorization) return res.sendStatus(403);
-    const payload: JwtPayload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    let payload: JwtPayload;
+    try {
+      payload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    } catch (err) {
+      return res.status(401).send(`Token expired at ${(err as TokenExpiredError).expiredAt.toLocaleString()}`);
+    }
     if (payload.permission !== 'Raktarvezeto') return res.sendStatus(403);
 
     mssql.query`SELECT * FROM Parts;`
@@ -55,7 +60,12 @@ export default class Controller {
 
   public addPart = (req: Request, res: Response) => {
     if (!req.headers.authorization) return res.sendStatus(403);
-    const payload: JwtPayload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    let payload: JwtPayload;
+    try {
+      payload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    } catch (err) {
+      return res.status(401).send(`Token expired at ${(err as TokenExpiredError).expiredAt.toLocaleString()}`);
+    }
     if (payload.permission !== 'Raktarvezeto') return res.sendStatus(403);
 
     mssql.query`INSERT INTO Parts([partName], price, partPerBox) VALUES(${req.body.partName},${req.body.price}, ${req.body.partPerBox});`
@@ -72,7 +82,12 @@ export default class Controller {
 
   public modifyPartPrice = (req: Request, res: Response) => {
     if (!req.headers.authorization) return res.sendStatus(403);
-    const payload: JwtPayload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    let payload: JwtPayload;
+    try {
+      payload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    } catch (err) {
+      return res.status(401).send(`Token expired at ${(err as TokenExpiredError).expiredAt.toLocaleString()}`);
+    }
     if (payload.permission !== 'Raktarvezeto') return res.sendStatus(403);
 
     mssql.query`UPDATE Parts SET price = ${req.body.price} WHERE partID = ${req.params.partID};`
