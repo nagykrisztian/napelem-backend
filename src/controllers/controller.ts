@@ -4,8 +4,25 @@ import { createHash } from 'node:crypto';
 import mssql from '../sql.js';
 
 export default class Controller {
+  private authorize = (authHeader: string | undefined, res: Response) => {
+    if (!authHeader) {
+      res.sendStatus(403);
+      return false;
+    }
+    try {
+      return jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
+    } catch (err) {
+      if (err instanceof jwt.TokenExpiredError) {
+        res.status(401).send({ msg: `Token expired at ${(err as TokenExpiredError).expiredAt.toLocaleString()}` });
+        return false;
+      }
+      res.status(401).send(err);
+      return false;
+    }
+  };
+
   public testMethod = (req: Request, res: Response) => {
-    mssql.query`SELECT 1+1 AS result');`
+    mssql.query`SELECT 1+1 AS result;`
       .then((result) => {
         // console.log(result.recordset);
         res.send(result.recordset);
@@ -37,16 +54,9 @@ export default class Controller {
   };
 
   public getAllParts = (req: Request, res: Response) => {
-    if (!req.headers.authorization) return res.sendStatus(403);
-    let payload: JwtPayload;
-    try {
-      payload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
-    } catch (err) {
-      if (err instanceof jwt.TokenExpiredError)
-        return res.status(401).send({ msg: `Token expired at ${(err as TokenExpiredError).expiredAt.toLocaleString()}` });
-      return res.status(401).send(err);
-    }
-
+    const payload: JwtPayload | false = this.authorize(req.headers.authorization, res);
+    if (payload === false) return;
+    payload as JwtPayload;
     if (payload.permission !== 'Raktarvezeto') return res.sendStatus(403);
 
     mssql.query`SELECT * FROM Parts;`
@@ -57,16 +67,9 @@ export default class Controller {
   };
 
   public addPart = (req: Request, res: Response) => {
-    if (!req.headers.authorization) return res.sendStatus(403);
-    let payload: JwtPayload;
-    try {
-      payload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
-    } catch (err) {
-      if (err instanceof jwt.TokenExpiredError)
-        return res.status(401).send({ msg: `Token expired at ${(err as TokenExpiredError).expiredAt.toLocaleString()}` });
-      return res.status(401).send(err);
-    }
-
+    const payload: JwtPayload | false = this.authorize(req.headers.authorization, res);
+    if (payload === false) return;
+    payload as JwtPayload;
     if (payload.permission !== 'Raktarvezeto') return res.sendStatus(403);
 
     mssql.query`INSERT INTO Parts([partName], price, partPerBox) VALUES(${req.body.partName},${req.body.price}, ${req.body.partPerBox});`
@@ -77,16 +80,9 @@ export default class Controller {
   };
 
   public modifyPartPrice = (req: Request, res: Response) => {
-    if (!req.headers.authorization) return res.sendStatus(403);
-    let payload: JwtPayload;
-    try {
-      payload = jwt.verify(req.headers.authorization.split(' ')[1], process.env.JWT_SECRET ?? '') as JwtPayload;
-    } catch (err) {
-      if (err instanceof jwt.TokenExpiredError)
-        return res.status(401).send({ msg: `Token expired at ${(err as TokenExpiredError).expiredAt.toLocaleString()}` });
-      return res.status(401).send(err);
-    }
-
+    const payload: JwtPayload | false = this.authorize(req.headers.authorization, res);
+    if (payload === false) return;
+    payload as JwtPayload;
     if (payload.permission !== 'Raktarvezeto') return res.sendStatus(403);
 
     mssql.query`UPDATE Parts SET price = ${req.body.price} WHERE partID = ${req.params.partID};`
