@@ -32,5 +32,6 @@
         "class-methods-use-this": "off",
         "@typescript-eslint/no-explicit-any": "warn",
         "consistent-return": "off"
-    }
+    },
+    "reportUnusedDisableDirectives": true
 }

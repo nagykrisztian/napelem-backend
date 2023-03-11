@@ -18,7 +18,6 @@ class App {
   private expressConfig(): void {
     this.app.use(bodyParser.json());
 
-    // eslint-disable-next-line consistent-return
     this.app.use((req, res, next) => {
       res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Origin, X-Requested-With,  Accept, Authorization,Content-Type');
       res.setHeader('Access-Control-Allow-Origin', '*');
