@@ -4,7 +4,7 @@
     "esModuleInterop": true,
     "strict": true,
     "pretty": true,
-    "allowJs": true,
+    "allowJs": false,
     "sourceMap": true,
     "removeComments": true,
     "experimentalDecorators": true,
