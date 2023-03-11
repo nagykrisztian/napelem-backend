@@ -5,6 +5,7 @@
     "strict": true,
     "pretty": true,
     "allowJs": false,
+    "noImplicitAny": true,
     "sourceMap": true,
     "removeComments": true,
     "experimentalDecorators": true,
