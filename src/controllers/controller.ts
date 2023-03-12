@@ -94,21 +94,50 @@ export default class Controller {
       .catch((err) => res.status(400).send({ msg: err as string }));
   };
 
-  public incomingParts = (req: Request, res: Response) => {
-    mssql
-      .query(
-        `INSERT INTO Storage (row, column, level, partID, currentPieces)
-        VALUES(${req.params.row}, ${req.params.column}, ${req.params.level}, ${req.params.partID}, ${req.params.currentPieces})
-        ON DUPLICATE KEY UPDATE 'currentPieces = currentPieces+${req.params.currentPieces}'`
-      )
-      .then(() => {
+  public incomingParts = async (req: Request, res: Response) => {
+    const payload: JwtPayload | false = this.authorize(req.headers.authorization, res);
+    if (payload === false) return;
+    if (payload.permission !== 'Raktarvezeto') return res.sendStatus(403);
+
+    // res.send(req.body);
+    // mssql.query`INSERT INTO Storage (row, column, level, partID, currentPieces)
+    //     VALUES(${req.params.row}, ${req.params.column}, ${req.params.level}, ${req.params.partID}, ${req.params.currentPieces})
+    //     ON DUPLICATE KEY UPDATE 'currentPieces = currentPieces+${req.params.currentPieces}'`
+    //   .then(() => {
+    //     res.sendStatus(201);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //     res.status(400).send({
+    //       msg: err as string,
+    //     });
+    //   });
+
+    const query1 = await mssql.query`SELECT s.[row], s.[column], s.[level], s.partID, s.currentPieces, p.partPerBox
+                                     FROM Storage s LEFT JOIN Parts p ON s.partID=p.partID WHERE (s.partID=${req.body.partID} OR s.partID IS NULL) AND available=1
+                                     ORDER BY currentPieces DESC`;
+
+    let db: number = req.body.db as number;
+    query1.recordset.forEach((element) => {
+      if ((element.currentPieces as number) + db < element.partPerBox) {
+        // eslint-disable-next-line no-unused-expressions
+        mssql.query`UPDATE Storage
+                    SET currentPieces=${(element.currentPieces as number) + db}
+                    WHERE [row]=${element.row} AND [column]=${element.column} AND [level]=${element.level}`;
         res.sendStatus(201);
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(400).send({
-          msg: err as string,
-        });
-      });
+      } else if ((element.currentPieces as number) + db === element.partPerBox) {
+        // eslint-disable-next-line no-unused-expressions
+        mssql.query`UPDATE Storage
+                    SET currentPieces=${(element.currentPieces as number) + db}, available = 0
+                    WHERE [row]=${element.row} AND [column]=${element.column} AND [level]=${element.level}`;
+      } else {
+        db = (element.currentPieces as number) + db - element.partPerBox;
+        // eslint-disable-next-line no-unused-expressions
+        mssql.query`UPDATE Storage
+                    SET currentPieces=${element.partPerBox}, available = 0
+                    WHERE [row]=${element.row} AND [column]=${element.column} AND [level]=${element.level}`;
+        res.status(200).send({ msg: Math.ceil(db / element.partPerBox) });
+      }
+    });
   };
 }
