@@ -93,4 +93,22 @@ export default class Controller {
       })
       .catch((err) => res.status(400).send({ msg: err as string }));
   };
+
+  public incomingParts = (req: Request, res: Response) => {
+    mssql
+      .query(
+        `INSERT INTO Storage (row, column, level, partID, currentPieces)
+        VALUES(${req.params.row}, ${req.params.column}, ${req.params.level}, ${req.params.partID}, ${req.params.currentPieces})
+        ON DUPLICATE KEY UPDATE 'currentPieces = currentPieces+${req.params.currentPieces}'`
+      )
+      .then(() => {
+        res.sendStatus(201);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(400).send({
+          msg: err as string,
+        });
+      });
+  };
 }
