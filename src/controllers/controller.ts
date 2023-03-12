@@ -111,7 +111,7 @@ export default class Controller {
       .catch((err) => {
         console.log(err);
         res.status(400).send({
-          msg: err,
+          msg: err as string,
         });
       });
   };
