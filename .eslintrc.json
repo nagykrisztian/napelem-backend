@@ -25,13 +25,13 @@
     ],
     "rules": {
         "prettier/prettier": "error",
-        // airbnb
         "import/no-unresolved": "off",
         "import/extensions": [
             "error",
             "always"
         ],
         "no-console": "off",
+        "no-unused-vars": "off",
         "class-methods-use-this": "off",
         "@typescript-eslint/no-explicit-any": "warn",
         "consistent-return": "off",
