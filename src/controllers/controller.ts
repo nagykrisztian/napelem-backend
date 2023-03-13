@@ -124,13 +124,10 @@ export default class Controller {
       const element = query1.recordset[i];
       if ((element.currentPieces as number) + db < element.partPerBox) {
         console.log('1');
-        try {
-          mssql.query`UPDATE Storage
+        mssql.query`UPDATE Storage
                     SET currentPieces=${(element.currentPieces as number) + db}
                     WHERE [row]=${element.row} AND [column]=${element.column} AND [level]=${element.level}`;
-        } catch (err) {
-          console.log(err);
-        }
+
         db = 0;
         res.sendStatus(201);
         return;
@@ -153,6 +150,9 @@ export default class Controller {
                       SET currentPieces=${partPerBox}, available = 0
                       WHERE [row]=${element.row} AND [column]=${element.column} AND [level]=${element.level}`;
     }
-    res.status(200).send({ boxesNeeded: Math.ceil(db / partPerBox), remainingPcs: db, partID: req.body.partID as number });
+    const query2 = await mssql.query`SELECT * FROM Storage WHERE partID IS NULL AND available=1`;
+    res
+      .status(200)
+      .send({ boxesNeeded: Math.ceil(db / partPerBox), remainingPcs: db, partID: req.body.partID as number, emptyBoxes: query2.recordset });
   };
 }
