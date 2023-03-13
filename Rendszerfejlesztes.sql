@@ -125,7 +125,7 @@ VALUES
     ('raktaros1', '4c28b8b24fed825f74f0df5749274682c7d88f3c08d816d52efe9c9a25e440d3', 2),
     -- raktaros1, raktarosjelszo
     ('raktarvezeto1', '4bd05fb1bef4fafabce6dcd47491614d5bc9a089bf1c28cf7369ac5d3a313bee', 3)
--- raktarosvezeto1, raktarvezetojelszo
+    -- raktarosvezeto1, raktarvezetojelszo
 
 INSERT INTO States
 VALUES
@@ -158,6 +158,28 @@ VALUES
     (2, 2, 1, 5, 10, 0),
     (2, 3, 1, 6, 200, 0),
     (3, 1, 1, 7, 300, 0)
+
+    DECLARE @Counter1 INT = 1
+    DECLARE @Counter2 INT = 1
+    DECLARE @Counter3 INT = 1
+    WHILE ( @Counter1 <= 3)
+    BEGIN
+        SET @Counter2 = 1
+        WHILE(@Counter2<=4)
+        BEGIN
+            SET @Counter3=1
+            WHILE(@Counter3<=5)
+            BEGIN
+                INSERT INTO Storage
+                VALUES
+                    (@Counter1, @Counter2, @Counter3, NULL, 0, 1)
+                SET @Counter3  = @Counter3  + 1;
+            END
+            SET @Counter2  = @Counter2  + 1;
+        END
+        SET @Counter1  = @Counter1  + 1;
+    END
+
 
 INSERT INTO Telemetry
     (projectID, stateID, startDate)
