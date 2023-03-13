@@ -114,30 +114,45 @@ export default class Controller {
     //   });
 
     const query1 = await mssql.query`SELECT s.[row], s.[column], s.[level], s.partID, s.currentPieces, p.partPerBox
-                                     FROM Storage s LEFT JOIN Parts p ON s.partID=p.partID WHERE (s.partID=${req.body.partID} OR s.partID IS NULL) AND available=1
+                                     FROM Storage s LEFT JOIN Parts p ON s.partID=p.partID WHERE (s.partID=${req.body.partID} ) AND available=1
                                      ORDER BY currentPieces DESC`;
-
+    const partPerBox = (await mssql.query`SELECT partPerBox from Parts WHERE partID=${req.body.partID}`).recordset[0].partPerBox as number;
     let db: number = req.body.db as number;
-    query1.recordset.forEach((element) => {
+
+    for (let i = 0; i < query1.recordset.length; i += 1) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const element = query1.recordset[i];
       if ((element.currentPieces as number) + db < element.partPerBox) {
-        // eslint-disable-next-line no-unused-expressions
-        mssql.query`UPDATE Storage
+        console.log('1');
+        try {
+          mssql.query`UPDATE Storage
                     SET currentPieces=${(element.currentPieces as number) + db}
                     WHERE [row]=${element.row} AND [column]=${element.column} AND [level]=${element.level}`;
+        } catch (err) {
+          console.log(err);
+        }
+        db = 0;
         res.sendStatus(201);
-      } else if ((element.currentPieces as number) + db === element.partPerBox) {
-        // eslint-disable-next-line no-unused-expressions
+        return;
+      }
+      if ((element.currentPieces as number) + db === element.partPerBox) {
+        console.log('2');
+
         mssql.query`UPDATE Storage
                     SET currentPieces=${(element.currentPieces as number) + db}, available = 0
                     WHERE [row]=${element.row} AND [column]=${element.column} AND [level]=${element.level}`;
-      } else {
-        db = (element.currentPieces as number) + db - element.partPerBox;
-        // eslint-disable-next-line no-unused-expressions
-        mssql.query`UPDATE Storage
-                    SET currentPieces=${element.partPerBox}, available = 0
-                    WHERE [row]=${element.row} AND [column]=${element.column} AND [level]=${element.level}`;
-        res.status(200).send({ msg: Math.ceil(db / element.partPerBox) });
+        db = 0;
+        res.sendStatus(200);
+        return;
       }
-    });
+
+      console.log('3');
+      db = (element.currentPieces as number) + db - partPerBox;
+
+      mssql.query`UPDATE Storage
+                      SET currentPieces=${partPerBox}, available = 0
+                      WHERE [row]=${element.row} AND [column]=${element.column} AND [level]=${element.level}`;
+    }
+    res.status(200).send({ boxesNeeded: Math.ceil(db / partPerBox), remainingPcs: db, partID: req.body.partID as number });
   };
 }
