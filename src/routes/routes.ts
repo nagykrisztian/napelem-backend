@@ -30,10 +30,16 @@ class Routes {
       next();
     }, this.controller.modifyPartPrice);
 
-    app.route('/incomingParts').post((req: Request, res: Response, next: NextFunction) => {
-      console.log(`Request type ${req.method} from ${req.originalUrl} time: ${new Date().toLocaleString()}`);
-      next();
-    }, this.controller.incomingParts);
+    app
+      .route('/incomingParts')
+      .patch((req: Request, res: Response, next: NextFunction) => {
+        console.log(`Request type ${req.method} from ${req.originalUrl} time: ${new Date().toLocaleString()}`);
+        next();
+      }, this.controller.incomingPartsFillExisting)
+      .put((req: Request, res: Response, next: NextFunction) => {
+        console.log(`Request type ${req.method} from ${req.originalUrl} time: ${new Date().toLocaleString()}`);
+        next();
+      }, this.controller.incomingParts);
   }
 }
 

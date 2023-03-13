@@ -94,7 +94,7 @@ export default class Controller {
       .catch((err) => res.status(400).send({ msg: err as string }));
   };
 
-  public incomingParts = async (req: Request, res: Response) => {
+  public incomingPartsFillExisting = async (req: Request, res: Response) => {
     const payload: JwtPayload | false = this.authorize(req.headers.authorization, res);
     if (payload === false) return;
     if (payload.permission !== 'Raktarvezeto') return res.sendStatus(403);
@@ -129,7 +129,7 @@ export default class Controller {
                     WHERE [row]=${element.row} AND [column]=${element.column} AND [level]=${element.level}`;
 
         db = 0;
-        res.sendStatus(201);
+        res.sendStatus(200);
         return;
       }
       if ((element.currentPieces as number) + db === element.partPerBox) {
@@ -154,5 +154,9 @@ export default class Controller {
     res
       .status(200)
       .send({ boxesNeeded: Math.ceil(db / partPerBox), remainingPcs: db, partID: req.body.partID as number, emptyBoxes: query2.recordset });
+  };
+
+  public incomingParts = (req: Request, res: Response) => {
+    // TODO
   };
 }
